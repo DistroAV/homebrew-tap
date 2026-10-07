@@ -4,13 +4,13 @@ cask "distroav" do
   version "6.2.1"
   sha256 "2f93e9d7de94f06c5eb36107c7451805ed41b55d32455c0e844215085490e50c"
 
-  url "https://github.com/DistroAV/DistroAV/releases/download/#{version}/distroav-#{version}-macos-universal.pkg",
-      verified: "github.com/DistroAV/DistroAV/"
+  url "https://github.com/DistroAV/DistroAV/releases/download/#{version}/distroav-#{version}-macos-universal.pkg"
   name "DistroAV"
   desc "NDI integration for OBS Studio"
   homepage "https://distroav.org/"
 
   depends_on cask: "libndi"
+  depends_on :macos
 
   # libndi cask does not manage the versioning yet (Q12026)
 
@@ -19,30 +19,17 @@ cask "distroav" do
   # The pkg installs the plugin files to /Library/Application Support/obs-studio/plugins
   # however OBS Studio expects them to be in ~/Library/Application Support/obs-studio/plugins
   # so we create symlinks to link the plugin files for OBS Studio.
-  postflight do
-    puts "Creating #{token} symlinks in ~/Library/Application Support/obs-studio/plugins"
-    target = Pathname.new("~/Library/Application Support/obs-studio/plugins").expand_path
-    source = "/Library/Application Support/obs-studio/plugins"
 
-    FileUtils.mkdir_p target
-
-    ["distroav.plugin", "distroav.plugin.dSYM"].each do |entry|
-      destination = target/entry
-      # Allow update via brew even if the plugin was manually installed.
-      FileUtils.rm_r(destination) if destination.exist?
-      FileUtils.ln_sf "#{source}/#{entry}", destination
-    end
-  end
-
-  uninstall_preflight do
-    puts "Removing #{token} symlinks from ~/Library/Application Support/obs-studio/plugins"
-    target = Pathname.new("~/Library/Application Support/obs-studio/plugins").expand_path
-
-    ["distroav.plugin", "distroav.plugin.dSYM"].each do |entry|
-      destination = target/entry
-      # Only uninstall if plugin was installed by brew, do not remove manually installed plugin.
-      File.unlink(destination) if destination.symlink?
-    end
+  # The symlinks are removed again on uninstall (remove_on_uninstall). Only symlinks
+  # pointing at the pkg-installed plugin are removed, a manually installed plugin is left alone.
+  postflight_steps do
+    # Allow update via brew even if the plugin was manually installed.
+    remove ["~/Library/Application Support/obs-studio/plugins/distroav.plugin",
+            "~/Library/Application Support/obs-studio/plugins/distroav.plugin.dSYM"], recursive: true
+    symlink "/Library/Application Support/obs-studio/plugins/distroav.plugin",
+            "~/Library/Application Support/obs-studio/plugins/distroav.plugin", remove_on_uninstall: true
+    symlink "/Library/Application Support/obs-studio/plugins/distroav.plugin.dSYM",
+            "~/Library/Application Support/obs-studio/plugins/distroav.plugin.dSYM", remove_on_uninstall: true
   end
 
   uninstall pkgutil: "org.distroav.distroav"
