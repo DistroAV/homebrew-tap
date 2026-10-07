@@ -32,7 +32,7 @@ cask "distroav" do
             source_base: :absolute, target_base: :home, remove_on_uninstall: true
   end
 
-  # The pkg receipt currently includes literal single quotes in its identifier.
+  # Until 6.2.2 the pkg receipt includes literal single quotes in its identifier.
   uninstall pkgutil: [
     "'org.distroav.distroav'",
     "org.distroav.distroav",
