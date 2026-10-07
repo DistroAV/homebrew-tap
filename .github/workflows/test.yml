@@ -13,6 +13,7 @@ jobs:
         os: [macos-15, macos-26]
         # when ready we can add xcode-27 for macos-27 test
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 2
     permissions:
       contents: read
     env:
