@@ -8,7 +8,7 @@ cask "distroav" do
   homepage "https://distroav.org/"
 
   depends_on cask: "libndi"
-  depends_on :macos
+  depends_on macos: :monterey
 
   # libndi cask does not manage the versioning yet (Q12026)
 
