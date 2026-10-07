@@ -24,6 +24,7 @@ cask "distroav" do
     # Allow update via brew even if the plugin was manually installed.
     remove ["Library/Application Support/obs-studio/plugins/distroav.plugin",
             "Library/Application Support/obs-studio/plugins/distroav.plugin.dSYM"], recursive: true, base: :home
+    mkdir_p "Library/Application Support/obs-studio/plugins/", base: :home
     symlink "/Library/Application Support/obs-studio/plugins/distroav.plugin",
             "Library/Application Support/obs-studio/plugins/distroav.plugin",
             source_base: :absolute, target_base: :home, remove_on_uninstall: true
